@@ -1,5 +1,6 @@
 const owner = "Kaico-hub";
 const pagesBaseUrl = `https://${owner.toLowerCase()}.github.io`;
+const portalRepositoryName = `${owner.toLowerCase()}.github.io`;
 
 const grid = document.querySelector("#projectGrid");
 const resultCount = document.querySelector("#resultCount");
@@ -42,7 +43,7 @@ async function loadProjects() {
 
   try {
     const repos = await fetchRepositories();
-    const pagesRepos = repos.filter((repo) => repo.has_pages);
+    const pagesRepos = repos.filter((repo) => repo.has_pages && !isPortalRepository(repo));
 
     projects = pagesRepos
       .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
@@ -87,6 +88,10 @@ function toProject(repo, index) {
     icon: getProjectIcon(repo.name),
     accent: accentColors[index % accentColors.length]
   };
+}
+
+function isPortalRepository(repo) {
+  return repo.name.toLowerCase() === portalRepositoryName;
 }
 
 function getProjectIcon(name) {

@@ -5,6 +5,7 @@ KaicoがGitHubで公開しているページやツールをまとめたページ
 ## 自動取得
 
 公開リポジトリのうち、GitHub APIで `has_pages: true` と返るものを自動で一覧表示します。
+`kaico-hub.github.io` のようなポータル自身のリポジトリは一覧に表示しません。
 
 現在の対象アカウントは `script.js` の `owner` で指定しています。
 
