@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="GitHub Pagesで公開しているページをまとめたポータルサイト">
+    <title>KaicoHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="KaicoHub home">
+        <span class="brand-mark" aria-hidden="true">K</span>
+        <span>KaicoHub</span>
+      </a>
+      <nav class="nav-links" aria-label="主要リンク">
+        <a href="#projects">Pages</a>
+        <a href="https://github.com/kaico-hub" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">GitHub Pages portal</p>
+        <h1 id="page-title">KaicoHub</h1>
+        <p class="lead">KaicoがGitHubで公開しているページやツールまとめ。</p>
+      </section>
+
+      <section class="projects-section" id="projects" aria-labelledby="projects-title">
+        <div class="section-heading">
+          <h2 id="projects-title">Links</h2>
+          <p id="resultCount" class="result-count" aria-live="polite"></p>
+        </div>
+        <div class="project-grid" id="projectGrid"></div>
+        <p class="empty-state" id="emptyState" hidden>表示できるページがありません。</p>
+      </section>
+    </main>
+  </body>
+</html>
