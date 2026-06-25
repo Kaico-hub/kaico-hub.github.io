@@ -91,7 +91,9 @@ function toProject(repo, index) {
 }
 
 function isPortalRepository(repo) {
-  return repo.name.toLowerCase() === portalRepositoryName;
+  const repoName = repo.name.toLowerCase();
+  const fullName = repo.full_name?.toLowerCase() || "";
+  return repoName === portalRepositoryName || fullName === `${owner.toLowerCase()}/${portalRepositoryName}`;
 }
 
 function getProjectIcon(name) {
