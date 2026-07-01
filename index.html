@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="GitHub Pagesで公開しているページをまとめたポータルサイト">
+    <meta name="description" content="Kaicoが公開しているWebページとアプリをまとめたポータルサイト">
     <title>KaicoHub</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js?v=20260625-portal-filter" defer></script>
+    <script src="script.js?v=20260701-apps" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -15,25 +15,35 @@
         <span>KaicoHub</span>
       </a>
       <nav class="nav-links" aria-label="主要リンク">
-        <a href="#projects">Pages</a>
+        <a href="#pages">Pages</a>
+        <a href="#apps">Apps</a>
         <a href="https://github.com/kaico-hub" rel="noreferrer">GitHub</a>
       </nav>
     </header>
 
     <main>
       <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">GitHub Pages portal</p>
+        <p class="eyebrow">GitHub portal</p>
         <h1 id="page-title">KaicoHub</h1>
-        <p class="lead">KaicoがGitHubで公開しているページやツールまとめ。</p>
+        <p class="lead">KaicoがGitHubで公開しているページとツールをまとめています。</p>
       </section>
 
-      <section class="projects-section" id="projects" aria-labelledby="projects-title">
+      <section class="projects-section" id="pages" aria-labelledby="pages-title">
         <div class="section-heading">
-          <h2 id="projects-title">Links</h2>
-          <p id="resultCount" class="result-count" aria-live="polite"></p>
+          <h2 id="pages-title">Pages</h2>
+          <p id="pagesResultCount" class="result-count" aria-live="polite"></p>
         </div>
-        <div class="project-grid" id="projectGrid"></div>
-        <p class="empty-state" id="emptyState" hidden>表示できるページがありません。</p>
+        <div class="project-grid" id="pagesGrid"></div>
+        <p class="empty-state" id="pagesEmptyState" hidden>表示できるページがありません。</p>
+      </section>
+
+      <section class="projects-section" id="apps" aria-labelledby="apps-title">
+        <div class="section-heading">
+          <h2 id="apps-title">Apps</h2>
+          <p id="appsResultCount" class="result-count" aria-live="polite"></p>
+        </div>
+        <div class="project-grid" id="appsGrid"></div>
+        <p class="empty-state" id="appsEmptyState" hidden>表示できるアプリがありません。</p>
       </section>
     </main>
   </body>

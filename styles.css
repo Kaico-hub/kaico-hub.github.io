@@ -140,6 +140,11 @@ h1 {
 .projects-section {
   display: grid;
   gap: 18px;
+  scroll-margin-top: 92px;
+}
+
+.projects-section + .projects-section {
+  margin-top: clamp(34px, 6vw, 64px);
 }
 
 .section-heading {

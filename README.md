@@ -1,16 +1,18 @@
 # KaicoHub
 
-KaicoがGitHubで公開しているページやツールをまとめたページです。
+KaicoがGitHubで公開しているWebページとツールをまとめたポータルサイトです。
 
-## 自動取得
+## 表示内容
 
-公開リポジトリのうち、GitHub APIで `has_pages: true` と返るものを自動で一覧表示します。
-(ポータル自身のリポジトリは一覧に表示しません。)
+- `Pages`: GitHub APIで `has_pages: true` と返る公開リポジトリを表示します。
+- `Apps`: 最新のGitHub Releaseがある公開リポジトリを表示し、Releaseページへリンクします。
 
-現在の対象アカウントは `script.js` の `owner` で指定しています。
+ポータル自身のリポジトリは一覧から除外します。
+
+対象アカウントは `script.js` の `owner` で指定しています。
 
 ```js
 const owner = "Kaico-hub";
 ```
 
-APIが利用できない場合や、取得結果が空の場合はページ一覧を表示しません。
+GitHub APIが利用できない場合や対象がない場合は、空の一覧として表示されます。

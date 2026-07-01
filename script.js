@@ -1,20 +1,44 @@
 const owner = "Kaico-hub";
-const pagesBaseUrl = `https://${owner.toLowerCase()}.github.io`;
-const portalRepositoryName = `${owner.toLowerCase()}.github.io`;
+const ownerSlug = owner.toLowerCase();
+const pagesBaseUrl = `https://${ownerSlug}.github.io`;
+const portalRepositoryName = `${ownerSlug}.github.io`;
 
-const grid = document.querySelector("#projectGrid");
-const resultCount = document.querySelector("#resultCount");
-const emptyState = document.querySelector("#emptyState");
+const pagesGrid = document.querySelector("#pagesGrid");
+const appsGrid = document.querySelector("#appsGrid");
+const pagesResultCount = document.querySelector("#pagesResultCount");
+const appsResultCount = document.querySelector("#appsResultCount");
+const pagesEmptyState = document.querySelector("#pagesEmptyState");
+const appsEmptyState = document.querySelector("#appsEmptyState");
 
-let projects = [];
-let dataSourceLabel = "GitHubから自動取得";
+let pageProjects = [];
+let appProjects = [];
+let pagesSourceLabel = "GitHubから自動取得";
+let appsSourceLabel = "GitHub Releasesから自動取得";
 
 const accentColors = ["#1a7f78", "#d2a734", "#d9634d", "#466a5b", "#7b6b3c"];
 
-function renderProjects() {
-  grid.innerHTML = projects.map(createProjectCard).join("");
-  resultCount.textContent = `${projects.length} links / ${dataSourceLabel}`;
-  emptyState.hidden = projects.length > 0;
+function renderAll() {
+  renderCollection({
+    grid: pagesGrid,
+    resultCount: pagesResultCount,
+    emptyState: pagesEmptyState,
+    items: pageProjects,
+    sourceLabel: pagesSourceLabel
+  });
+
+  renderCollection({
+    grid: appsGrid,
+    resultCount: appsResultCount,
+    emptyState: appsEmptyState,
+    items: appProjects,
+    sourceLabel: appsSourceLabel
+  });
+}
+
+function renderCollection({ grid, resultCount, emptyState, items, sourceLabel }) {
+  grid.innerHTML = items.map(createProjectCard).join("");
+  resultCount.textContent = `${items.length} links / ${sourceLabel}`;
+  emptyState.hidden = items.length > 0;
 }
 
 function createProjectCard(project) {
@@ -27,11 +51,11 @@ function createProjectCard(project) {
         <h3>${escapeHtml(project.title)}</h3>
         <p>${escapeHtml(project.description)}</p>
         <span class="tile-footer">
-          Open
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 17 17 7"></path>
-          <path d="M8 7h9v9"></path>
-        </svg>
+          ${escapeHtml(project.actionLabel)}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 17 17 7"></path>
+            <path d="M8 7h9v9"></path>
+          </svg>
         </span>
       </div>
     </a>
@@ -39,21 +63,26 @@ function createProjectCard(project) {
 }
 
 async function loadProjects() {
-  resultCount.textContent = "GitHubから読み込み中";
+  pagesResultCount.textContent = "GitHubから読み込み中";
+  appsResultCount.textContent = "GitHub Releasesから読み込み中";
 
   try {
     const repos = await fetchRepositories();
-    const pagesRepos = repos.filter((repo) => repo.has_pages && !isPortalRepository(repo));
+    const visibleRepos = repos.filter((repo) => !isPortalRepository(repo));
 
-    projects = pagesRepos
-      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-      .map((repo, index) => toProject(repo, index));
+    pageProjects = visibleRepos
+      .filter((repo) => repo.has_pages)
+      .sort(sortByUpdatedAt)
+      .map((repo, index) => toPageProject(repo, index));
+
+    appProjects = await fetchReleasedProjects(visibleRepos);
   } catch (error) {
-    dataSourceLabel = "GitHub API取得失敗";
+    pagesSourceLabel = "GitHub API取得失敗";
+    appsSourceLabel = "GitHub API取得失敗";
     console.warn("GitHub repositories could not be loaded.", error);
   }
 
-  renderProjects();
+  renderAll();
 }
 
 async function fetchRepositories() {
@@ -80,20 +109,60 @@ async function fetchRepositories() {
   return [];
 }
 
-function toProject(repo, index) {
+async function fetchReleasedProjects(repos) {
+  const releaseResults = await Promise.allSettled(repos.map(fetchLatestRelease));
+
+  return releaseResults
+    .map((result) => result.status === "fulfilled" ? result.value : null)
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.release.published_at) - new Date(a.release.published_at))
+    .map(({ repo, release }, index) => toAppProject(repo, release, index));
+}
+
+async function fetchLatestRelease(repo) {
+  const response = await fetch(`https://api.github.com/repos/${repo.full_name}/releases/latest`, {
+    headers: {
+      Accept: "application/vnd.github+json"
+    }
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`Release request failed for ${repo.full_name}`);
+
+  const release = await response.json();
+  return release?.html_url ? { repo, release } : null;
+}
+
+function toPageProject(repo, index) {
   return {
     title: repo.name,
-    description: repo.description || "GitHub Pagesで公開しているページ。",
+    description: repo.description || "GitHub Pagesで公開しているページです。",
     url: `${pagesBaseUrl}/${encodeURIComponent(repo.name)}/`,
     icon: getProjectIcon(repo.name),
-    accent: accentColors[index % accentColors.length]
+    accent: accentColors[index % accentColors.length],
+    actionLabel: "Open"
   };
+}
+
+function toAppProject(repo, release, index) {
+  return {
+    title: repo.name,
+    description: repo.description || release.name || "Windows向けアプリのリリースページです。",
+    url: release.html_url || `${repo.html_url}/releases/latest`,
+    icon: getProjectIcon(repo.name),
+    accent: accentColors[(index + 2) % accentColors.length],
+    actionLabel: "Release"
+  };
+}
+
+function sortByUpdatedAt(a, b) {
+  return new Date(b.updated_at) - new Date(a.updated_at);
 }
 
 function isPortalRepository(repo) {
   const repoName = repo.name.toLowerCase();
   const fullName = repo.full_name?.toLowerCase() || "";
-  return repoName === portalRepositoryName || fullName === `${owner.toLowerCase()}/${portalRepositoryName}`;
+  return repoName === portalRepositoryName || fullName === `${ownerSlug}/${portalRepositoryName}`;
 }
 
 function getProjectIcon(name) {
@@ -115,5 +184,5 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-renderProjects();
+renderAll();
 loadProjects();
